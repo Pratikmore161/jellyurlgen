@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jellyfin Url Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        .title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .generated-url {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        button.copy-button {
+            background-color: #28a745;
+            margin-top: 10px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 class="title">Jellyfin Video Player URL Generator</h1>
+            <input type="text" id="videoId" placeholder="Enter Video ID">
+            <button id="generateButton1">360p</button>
+            <button id="generateButton2">720p</button>
+            <button id="generateButton3">Orignal</button>
+            <div class="generated-url" id="generatedUrl1"></div>
+            <div class="generated-url" id="generatedUrl2"></div>
+            <div class="generated-url" id="generatedUrl3"></div>
+        </div>
+    </div>
+    <!-- ... (other code remains the same) ... -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const apiKey = decodeURIComponent(new URLSearchParams(window.location.search).get("apiKey"));
+        const domainUrl = decodeURIComponent(new URLSearchParams(window.location.search).get("domainUrl"));
+
+        const generateButton1 = document.getElementById("generateButton1");
+        const generateButton2 = document.getElementById("generateButton2");
+        const generateButton3 = document.getElementById("generateButton3");
+        const generatedUrl1 = document.getElementById("generatedUrl1");
+        const generatedUrl2 = document.getElementById("generatedUrl2");
+        const generatedUrl3 = document.getElementById("generatedUrl3");
+        const videoIdInput = document.getElementById("videoId");
+
+        generateButton1.addEventListener("click", function() {
+            generatePlaybackUrl(videoIdInput.value, generatedUrl1, apiKey, domainUrl,
+                "h264,h264", "aac", 1, 292000, 128000, 44100);
+        });
+
+        generateButton2.addEventListener("click", function() {
+            generatePlaybackUrl(videoIdInput.value, generatedUrl2, apiKey, domainUrl,
+                "h264,h264", "aac", 1, 591710, 128290, 44100);
+        });
+
+        generateButton3.addEventListener("click", function() {
+            generateCustomPlaybackUrl(generatedUrl3, apiKey, domainUrl);
+        });
+
+        function generatePlaybackUrl(videoId, outputElement, apiKey, domainUrl, videoCodec, audioCodec, audioStreamIndex, videoBitrate, audioBitrate, audioSampleRate) {
+            const deviceId = "TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzExNS4wLjAuMCBTYWZhcmkvNTM3LjM2fDE2OTE5MTMzMTQwNjk1";
+
+            const playbackUrl = `${domainUrl}/videos/${videoId}/main.m3u8?DeviceId=${deviceId}&MediaSourceId=${videoId}&VideoCodec=${videoCodec}&AudioCodec=${audioCodec}&AudioStreamIndex=${audioStreamIndex}&VideoBitrate=${videoBitrate}&AudioBitrate=${audioBitrate}&AudioSampleRate=${audioSampleRate}&MaxFramerate=23.976025&api_key=${apiKey}`;
+
+            outputElement.innerHTML = `<p><strong>Generated Jellyfin Playback URL:</strong></p><a href="${playbackUrl}" target="_blank">${playbackUrl}</a>`;
+
+            const copyButton = document.createElement("button");
+            copyButton.textContent = "Copy URL";
+            copyButton.addEventListener("click", function() {
+                const textarea = document.createElement("textarea");
+                textarea.value = playbackUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                alert("URL copied to clipboard!");
+            });
+
+            outputElement.appendChild(copyButton);
+            outputElement.style.display = "flex";
+        }
+
+        function generateCustomPlaybackUrl(outputElement, apiKey, domainUrl) {
+            const customPlaybackUrl = `${domainUrl}/videos/${videoIdInput.value}/main.m3u8?api_key=${apiKey}`;
+
+            outputElement.innerHTML = `<p><strong>Generated Jellyfin Playback URL:</strong></p><a href="${customPlaybackUrl}" target="_blank">${customPlaybackUrl}</a>`;
+
+            const copyButton = document.createElement("button");
+            copyButton.textContent = "Copy URL";
+            copyButton.addEventListener("click", function() {
+                const textarea = document.createElement("textarea");
+                textarea.value = customPlaybackUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textarea);
+                alert("URL copied to clipboard!");
+            });
+
+            outputElement.appendChild(copyButton);
+            outputElement.style.display = "flex";
+        }
+    });
+</script>
+<!-- ... (other code remains the same) ... -->
+</body>
+</html>
